@@ -1,0 +1,3 @@
+# Balancing Data for Generalizable Machine Learning to Predict Glass-Forming Ability of Ternary Alloys
+
+This repository contains all the data and scripts to reproduce the results from "Balancing Data for Generalizable Machine Learning to Predict Glass-Forming Ability of Ternary Alloys", a manuscript authored by Yi Yao, Timothy Sullivan IV, Feng Yan, Jiaqi Gong and Lin Li. This repository has 4 continous parts. Implementing these different parts in sequence to reproduce the results.
