@@ -1,6 +1,6 @@
-# coding: utf-8
-# author: Yi Yao
-# data: 05/14/2021
+#/ coding: utf-8
+#/ author: Yi Yao
+#/ data: 05/14/2021
 
 ''' Leave one alloy system out '''
 
@@ -83,8 +83,8 @@ def get_AveAndStd(L):
 
 # Main function:
 
-Dataset = "Original"
-# Dataset = "Balanced"
+# Dataset = "Original"
+Dataset = "Balanced"
 
 L_label = ['AlNiTi','CoFeZr','CoTiZr','CoVZr','FeTiNb','AlCuFe','AlFeGd','AlFeNi','AlMgTi','BFeN','BFeNb',
            'BFeZr','CoFeNb','CoMnNb','CrGePd','CrMoNi','FeHfTa']
@@ -110,7 +110,6 @@ predData = pd.read_excel(path_gfa)
 L_auc  = []
 L_rmse = []
 L_pred_GFA = []
-L_ROC = []
 
 # leave-one-alloy-system-out
 for i in L_label:
@@ -125,6 +124,7 @@ for i in L_label:
     L_AUC_Temp = []
     L_RMSE_Temp = []
     L_GFA_Temp = []
+    L_ROC_Temp = []
 
     # Normalization
     meanNorm, rangeNorm = getNormPara(trainFeatureX)
@@ -153,9 +153,14 @@ for i in L_label:
         # get ROC data
         y_pred_keras = model_keras.predict(testFeatureX).ravel()
         fpr_keras, tpr_keras, thresholds_keras = roc_curve(testLabelY, y_pred_keras)
+        L_ROC_Temp.append([fpr_keras, tpr_keras])
     
     # store data into list
-    L_ROC.append([fpr_keras, tpr_keras])
+    if (Dataset == "Original"):
+        saving_path_roc = data_path + "/leave-one-alloySystem-out/roc/original/" + i + '.xlsx'
+    if (Dataset == "Balanced"):
+        saving_path_roc = data_path + "/leave-one-alloySystem-out/roc/balanced/" + i + '.xlsx'
+    pd.DataFrame(L_ROC_Temp).T.to_excel(saving_path_roc, header=False, index=False)
     L_auc.append(get_AveAndStd(L_AUC_Temp))
     L_rmse.append(get_AveAndStd(L_RMSE_Temp))
     L_pred_GFA.extend(get_AveAndStd(L_GFA_Temp))
@@ -166,14 +171,11 @@ L_data_saving = [L_label, L_auc, L_rmse]
 if (Dataset == "Original"):
     saving_path1 = data_path + "/leave-one-alloySystem-out/AUC and RMSE by original dataset.xlsx"
     saving_path2 = data_path + "/leave-one-alloySystem-out/predicted GFA by original dataset.xlsx"
-    saving_path3 = data_path + "/leave-one-alloySystem-out/ROC by original dataset.xlsx"
 
 if (Dataset == 'Balanced'):
     saving_path1 = data_path + "/leave-one-alloySystem-out/AUC and RMSE by balanced dataset.xlsx"
     saving_path2 = data_path + "/leave-one-alloySystem-out/predicted GFA by balanced dataset.xlsx"
-    saving_path3 = data_path + "/leave-one-alloySystem-out/ROC by balanced dataset.xlsx"
 
 pd.DataFrame(L_data_saving).T.to_excel(saving_path1, header=False, index=False)
 pd.DataFrame(L_pred_GFA).T.to_excel(saving_path2, header=False, index=False)
-pd.DataFrame(L_ROC).T.to_excel(saving_path3, index=False, header=False)
 
